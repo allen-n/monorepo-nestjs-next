@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
 
 /**
  * Injects the user into the request object if successful:
@@ -15,7 +16,9 @@ import { AuthGuard } from '@nestjs/passport';
 export class RefreshTokenGuard extends AuthGuard('jwt-refresh') {
   private readonly logger = new Logger(RefreshTokenGuard.name);
 
-  canActivate(context: ExecutionContext) {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.
     return super.canActivate(context);

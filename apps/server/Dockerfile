@@ -23,21 +23,21 @@ RUN apt-get update -qq && \
 
 # Install node modules
 COPY --link package-lock.json package.json ./
-RUN npm ci --include=dev
+RUN pnpm ci --include=dev
 
 # Copy application code
 COPY --link . .
 
 # Generate prisma schema
-RUN npm run prisma:generate
+RUN pnpm run prisma:generate
 
 
 # Build application
-RUN npm run build
+RUN pnpm run build
 
 
 # Run tests
-RUN npm run test
+RUN pnpm run test
 
 # Final stage for app image
 FROM base
@@ -47,4 +47,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "npm", "run", "start:migrate:prod" ]
+CMD [ "pnpm", "run", "start:migrate:prod" ]

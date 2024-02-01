@@ -36,7 +36,7 @@ If you're using vscode, you can use the `Start Debug Server` config, which will:
 2. Start the API in dev mode (i.e. hot reload)
 3. Spin down the containers when you kill the debugger
 
-Otherwise, just run `docker compose up db adminer` to spin up the database and adminer containers, and then run `npm run start:dev` to start the API in dev mode (and `docker compose down` to spin down the containers when you're done).
+Otherwise, just run `docker compose up db adminer` to spin up the database and adminer containers, and then run `pnpm run start:dev` to start the API in dev mode (and `docker compose down` to spin down the containers when you're done).
 
 ## Running the local postgres docker container
 
@@ -72,10 +72,12 @@ Overview:
 
 1. Make changes to the schema in `prisma/schema.prisma`.
 2. Start the local database container (see above).
-3. run `npm run prisma:debug` to test the change on the local database (or run `npx prisma db push`).
+3. run `pnpm run prisma:debug` to test the change on the local database (or run `pnpx prisma db push`).
 4. Keep making changes until you're happy with them, using the `prisma:debug` command to test them.
 5. Once you're happy with them, you can `git stash` to stash the changes you made to the schema and run `prisma:debug` once more go go back to what you had. Then `git stash pop` to get the changes back (which you know work, due to your prototyping in steps 1-4).
-6. Finally, run `npm run prisma:dev <name>` (or `npx prisma migrate --name <name>`) create a migration that creates the changes. You can skip step 5, but that will create drift in the database that will force you to reset it completely.
+6. Finally, run `pnpm run prisma:dev <name>` (or `pnpx prisma migrate --name <name>`) create a migration that creates the changes. You can skip step 5, but that will create drift in the database that will force you to reset it completely.
+
+*Note: The first time you run things locally, you will need to spin up the database and run a `pnpm run prisma:dev` to initialize the local db schema. The scripts in the dockerfile will handle doing this in production*
 
 ## How to run the server outside the container
 
@@ -86,33 +88,33 @@ Overview:
 ### Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Running the app
 
 ```bash
 # development
-$ npm run start
+$ pnpm run start
 
 # watch mode
-$ npm run start:dev
+$ pnpm run start:dev
 
 # production mode
-$ npm run start:prod
+$ pnpm run start:prod
 ```
 
 ### Test
 
 ```bash
 # unit tests
-$ npm run test
+$ pnpm run test
 
 # e2e tests
-$ npm run test:e2e
+$ pnpm run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ pnpm run test:cov
 ```
 
 ### Authors
