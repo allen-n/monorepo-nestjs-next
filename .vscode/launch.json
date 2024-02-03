@@ -10,7 +10,6 @@
       "cwd": "${workspaceFolder}/apps/web",
       "console": "integratedTerminal"
     },
-
     {
       "name": "Start Debug Server",
       "type": "node",
@@ -21,6 +20,18 @@
       "runtimeArgs": ["run", "start:dev"],
 
       "cwd": "${workspaceFolder}/apps/server",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Start Parallel Debug (Server/Web)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "preLaunchTask": "docker-compose-up",
+      "postDebugTask": "docker-compose-down",
+      "runtimeArgs": ["run", "dev"],
+
+      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
     }
   ]

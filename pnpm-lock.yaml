@@ -6,6 +6,8 @@ settings:
 
 importers:
 
+  .: {}
+
   apps/server:
     dependencies:
       '@fastify/static':

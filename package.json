@@ -1,0 +1,12 @@
+{
+  "name": "monorepo-generic-stack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm run --parallel dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
