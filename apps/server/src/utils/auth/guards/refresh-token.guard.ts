@@ -24,7 +24,7 @@ export class RefreshTokenGuard extends AuthGuard('jwt-refresh') {
     return super.canActivate(context);
   }
 
-  handleRequest(err, user, info, context, status) {
+  handleRequest(err: any, user: any, info: any, context: any, status: any) {
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       this.logger.error(info);

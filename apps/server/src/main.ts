@@ -60,7 +60,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService<EnvironmentVariables>);
   const PORT = configService.get('PORT', { infer: true });
 
-  await app.listen(PORT, '0.0.0.0'); // MUST specify 0.0.0.0 using fastify
+  await app.listen(PORT || '0.0.0.0'); // MUST specify 0.0.0.0 using fastify
   logger.log(`Listening on port ${PORT}`);
 }
 bootstrap();

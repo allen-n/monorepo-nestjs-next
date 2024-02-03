@@ -12,8 +12,8 @@ import { User } from '@prisma/client';
 import { BcryptService } from '@utils/auth/bcrypt';
 import { EnvironmentVariables } from '@utils/config/config';
 import { randomBytesAsync } from '@utils/crypto';
-import { randomBytes } from 'crypto';
 import { validatedJwtUserInfo } from './types';
+import { PasswordlessUser } from '@utils/auth/dto/passwordless-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +40,7 @@ export class AuthService {
   async validateUser(
     email: string,
     plaintextPass: string,
-  ): Promise<User | null> {
+  ): Promise<PasswordlessUser | null> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException(
@@ -54,9 +54,12 @@ export class AuthService {
     if (!validPassword) {
       return null;
     }
-
-    delete user.passwordHash; // Remove the hashed password
-    return user;
+    const userCopy: PasswordlessUser & { passwordHash?: string } = {
+      ...user,
+    };
+    delete userCopy.passwordHash;
+    // delete user?.passwordHash; // Remove the hashed password
+    return userCopy as PasswordlessUser;
   }
 
   /**
@@ -73,7 +76,7 @@ export class AuthService {
   }
 
   async logout(user: validatedJwtUserInfo) {
-    await this.usersService.update(user.userId, { refreshToken: null });
+    await this.usersService.update(user.userId, { refreshToken: undefined });
     return { message: 'Logged out successfully' };
   }
 
@@ -149,6 +152,7 @@ export class AuthService {
     const token = buffer.toString('hex');
     await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
 
+    // TODO @allen-n: Consider bcrypting the token before saving it to the database
     const reset = await this.usersService.createPasswordReset(user.id, token);
     this.logger.log(
       `Sending password reset email to ${email} with magic id ${reset.token}`,

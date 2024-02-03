@@ -7,7 +7,7 @@ export class AppController {
   private readonly logger = new Logger(AppController.name);
 
   @Get('/health')
-  getHealth(@Headers() headers?): string {
+  getHealth(@Headers() headers?: any): string {
     this.logger.log(
       `Health check from host: ${headers?.host ?? 'null'}. Referrer: ${
         headers?.referer ?? 'null'

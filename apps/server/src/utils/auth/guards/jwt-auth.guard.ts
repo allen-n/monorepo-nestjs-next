@@ -24,7 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return result;
   }
 
-  handleRequest(err, user, info, context, status) {
+  handleRequest(err: any, user: any, info: any, context: any, status: any) {
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       this.logger.error(info);

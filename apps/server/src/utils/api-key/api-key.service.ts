@@ -28,10 +28,10 @@ export class ApiKeyService {
     });
     if (!result) {
       return {
-        apiKey: null,
+        apiKey: '',
         success: false,
         message: 'API key creation failed. Please try again.',
-        ownerEmail: result.user.email,
+        ownerEmail: 'n/a',
       };
     }
     return {

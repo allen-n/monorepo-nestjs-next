@@ -21,5 +21,5 @@ export interface PasswordAuthenticatedRequest extends Request {
 }
 
 export interface AuthenticatedRequest extends Request {
-  apiKey: ApiKey;
+  apiKey: Omit<ApiKey, 'key'>;
 }

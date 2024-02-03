@@ -11,11 +11,16 @@ export class FastifyDomainFilterMiddleware implements NestMiddleware {
     private readonly configService: ConfigService<EnvironmentVariables>,
   ) {
     // Add your allowed domains here
-    this.allowedDomains = configService.get('FRONTEND_URL', { infer: true });
+    this.allowedDomains =
+      configService.get('FRONTEND_URL', { infer: true }) || '';
+
+    if (!this.allowedDomains) {
+      throw new Error('FRONTEND_URL is not defined');
+    }
   }
 
   use(req: FastifyRequest, res: any, next: () => void) {
-    const origin = req.headers.host;
+    const origin = req.headers.host || '';
 
     if (!this.allowedDomains.includes(origin)) {
       throw new ForbiddenException({

@@ -6,6 +6,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { ApiKey } from '@prisma/client';
 import { ApiKeyService } from '@utils/api-key/api-key.service';
 import { AuthenticatedRequest } from '@utils/auth/types';
 
@@ -17,7 +18,7 @@ export class ApiKeyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: AuthenticatedRequest = context.switchToHttp().getRequest();
-    const key: string = req.headers[this.sApiKeyBearer];
+    const key: string | null = req.headers.get(this.sApiKeyBearer);
     const reqInfoString = `${req.method}, url: ${req.url}`;
     if (!key) {
       this.logger.warn(`No API key provided. ${reqInfoString}`);
@@ -33,11 +34,10 @@ export class ApiKeyGuard implements CanActivate {
         HttpStatus.UNAUTHORIZED,
       );
     }
-
-    req.apiKey = keyObject;
-
     // Remove sensitive values from the request object
-    delete req.apiKey.key;
+    const keyCopy: Omit<ApiKey, 'key'> & { key?: string } = { ...keyObject };
+    delete keyCopy.key;
+    req.apiKey = keyCopy;
 
     // TODO @allen: figure out best way to track these api requests (maybe in a table somewhere?)
     this.logger.log(

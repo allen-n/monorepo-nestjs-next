@@ -77,6 +77,9 @@ export class AuthController {
   @ApiBearerAuth(sJwtBearer)
   @UseGuards(RefreshTokenGuard)
   async refresh(@Request() req: JwtAuthenticatedRequest) {
+    if (!req.user.refreshToken) {
+      throw new Error('No refresh token found in request.');
+    }
     return this.authService.refreshTokens(
       req.user.userId,
       req.user.refreshToken,
