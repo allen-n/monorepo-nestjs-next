@@ -33,8 +33,13 @@ export class AuthService {
     const updatedUser = await this.usersService.update(user.id, {
       refreshToken: await this.bcryptService.hash(tokens.refreshToken),
     });
+    const userCopy: PasswordlessUser & { passwordHash?: string } = {
+      ...updatedUser,
+    };
+    delete userCopy.passwordHash;
+    // delete user?.passwordHash; // Remove the hashed password
     this.logger.log(`Created user with email: ${user.email}`);
-    return { user: updatedUser, tokens: tokens };
+    return { user: userCopy, tokens: tokens };
   }
 
   async validateUser(

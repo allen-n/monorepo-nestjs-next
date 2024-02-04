@@ -1,4 +1,6 @@
 import { AppModule } from '@app/app.module';
+import { fastifyCookie, FastifyCookieOptions } from '@fastify/cookie';
+
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -17,6 +19,7 @@ async function bootstrap() {
     new FastifyAdapter({ logger: false }),
   );
   app.useGlobalPipes(new ValidationPipe());
+
   const logger = new Logger('NestBootstrap');
 
   // Create a Swagger document options
@@ -59,6 +62,12 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService<EnvironmentVariables>);
   const PORT = configService.get('PORT', { infer: true });
+  const cookieSecret = configService.get('COOKIE_SECRET', { infer: true });
+
+  // @ts-expect-error - fastifyCookie is not typed correctly
+  await app.register(fastifyCookie, {
+    secret: cookieSecret, // for cookies signature
+  } as FastifyCookieOptions);
 
   await app.listen(PORT || '0.0.0.0'); // MUST specify 0.0.0.0 using fastify
   logger.log(`Listening on port ${PORT}`);
