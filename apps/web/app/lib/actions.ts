@@ -1,7 +1,6 @@
 'use server';
 
-// import { signIn } from '@/auth';
-import { authService } from '@web/app/services/auth';
+import { ApiError, apiService } from '@web/app/services/api';
 
 export async function authenticate(formData: FormData) {
   try {
@@ -10,12 +9,21 @@ export async function authenticate(formData: FormData) {
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
-    await authService.login({
+    await apiService.login({
       email: email,
       password: password,
     });
   } catch (error) {
-    console.error('Auth error', error);
-    throw error;
+    const e = error as ApiError;
+    console.error('Auth error', e);
+  }
+}
+
+export async function logout() {
+  try {
+    await apiService.logout();
+  } catch (error) {
+    const e = error as ApiError;
+    console.error('Logout error', e);
   }
 }

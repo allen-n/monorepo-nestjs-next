@@ -74,7 +74,7 @@ export class AuthController {
         refreshTokenCookieOptions,
       );
     }
-
+    delete res.user.passwordHash;
     return res;
   }
 

@@ -1,4 +1,5 @@
 import axios, {
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   CreateAxiosDefaults,
@@ -11,6 +12,11 @@ import {
   RefreshTokenResponseDto,
 } from '@server/utils/auth/dto/login.dto';
 
+export interface ApiError {
+  message: string;
+  data: any;
+}
+
 export class ApiService {
   protected readonly axiosInstance: AxiosInstance;
   private accessToken: string | null = null; // Store access token in memory
@@ -18,6 +24,8 @@ export class ApiService {
     config.withCredentials = true;
     config.headers = { 'Content-Type': 'application/json', ...config.headers };
     this.axiosInstance = axios.create(config);
+    this.handleRequest = this.handleRequest.bind(this);
+    this.handleError = this.handleError.bind(this);
     this.initializeRequestInterceptor();
     console.debug('ApiService initialized');
   }
@@ -32,12 +40,7 @@ export class ApiService {
   protected handleRequest(
     config: InternalAxiosRequestConfig,
   ): InternalAxiosRequestConfig {
-    // Implement request configuration (e.g., adding authorization headers)
-    if (this.accessToken) {
-      config.headers.Authorization = `Bearer ${this.accessToken}`;
-    } else {
-      console.warn('No access token found in memory');
-    }
+    // Implement additional request configuration (e.g., adding authorization headers)
     return config;
   }
 
@@ -65,21 +68,27 @@ export class ApiService {
   // Auth specific methods
   public async login(
     credentials: EmailPasswordLoginDto,
-  ): Promise<EmailPasswordLoginResponseDto> {
-    console.log('login this', this);
-    const response = await this.post<EmailPasswordLoginResponseDto>(
-      'v1/auth/login',
-      credentials,
-    );
-    this.accessToken = response.accessToken;
-
-    return response;
+  ): Promise<EmailPasswordLoginResponseDto | ApiError> {
+    console.log('login', credentials);
+    try {
+      const response = await this.post<EmailPasswordLoginResponseDto>(
+        'v1/auth/login',
+        credentials,
+      );
+      this.setAccessToken(response.accessToken);
+      console.log('login response', response);
+      return response;
+    } catch (error: any) {
+      const e = error as AxiosError;
+      throw { message: e.message, data: e.response?.data };
+    }
   }
 
-  public logout(): void {
-    this.clearAccessToken();
+  public async logout(): Promise<void> {
     // Call server endpoint to clear the HttpOnly cookie
-    this.post('/logout');
+    console.log('logout');
+    await this.get('v1/auth/logout');
+    this.clearAccessToken();
   }
 
   public async refreshToken(): Promise<void> {
@@ -93,10 +102,14 @@ export class ApiService {
 
   private setAccessToken(token: string): void {
     this.accessToken = token;
+    this.axiosInstance.defaults.headers.common[
+      'Authorization'
+    ] = `Bearer ${token}`;
   }
 
   private clearAccessToken(): void {
     this.accessToken = null;
+    delete this.axiosInstance.defaults.headers.common['Authorization'];
   }
 }
 
@@ -104,5 +117,5 @@ const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 if (!serverUrl) {
   throw new Error('Server URL not found');
 }
-const authService = new ApiService({ baseURL: serverUrl });
-export { authService };
+const apiService = new ApiService({ baseURL: serverUrl });
+export { apiService };

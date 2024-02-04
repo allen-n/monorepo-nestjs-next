@@ -1,4 +1,4 @@
-import { authenticate } from '@web/app/lib/actions';
+import { authenticate, logout } from '@web/app/lib/actions';
 
 export default function Page() {
   return (
@@ -15,6 +15,12 @@ export default function Page() {
           />
           <button className="text-white" type="submit">
             Login
+          </button>
+        </form>
+        <form action={logout}>
+          {' '}
+          <button className="text-white" type="submit">
+            logout
           </button>
         </form>
       </div>
